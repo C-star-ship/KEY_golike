@@ -1,67 +1,190 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>FREE KEY</title>
+
 <style>
 
 body{
+margin:0;
 background:black;
-color:#00ff9f;
+color:#00ff00;
 font-family:monospace;
-text-align:center;
-margin-top:120px;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
 }
 
-.keybox{
-border:2px solid #00ff9f;
-padding:20px;
-border-radius:10px;
-width:80%;
-margin:auto;
-font-size:20px;
+.box{
+
+width:92%;
+max-width:420px;
+
+background:black;
+
+border:2px solid #00ff00;
+
+border-radius:15px;
+
+padding:35px;
+
+box-shadow:
+0 0 20px #00ff00,
+0 0 60px #00ff00;
+
+text-align:center;
+
+}
+
+.title{
+font-size:24px;
+margin-bottom:20px;
 }
 
 button{
-margin-top:20px;
-padding:15px 35px;
+
+width:90%;
+
+padding:14px;
+
 font-size:18px;
-background:#00ff9f;
-border:none;
+
+background:black;
+
+color:#00ff00;
+
+border:2px solid #00ff00;
+
 border-radius:10px;
+
+cursor:pointer;
+
+}
+
+button:hover{
+
+background:#00ff00;
+color:black;
+
+}
+
+.keybox{
+
+margin-top:20px;
+
+padding:15px;
+
+border:2px dashed #00ff00;
+
+border-radius:10px;
+
+font-size:18px;
+
+word-break:break-all;
+
+}
+
+.copy{
+margin-top:10px;
+cursor:pointer;
+color:#00ffff;
 }
 
 </style>
+
 </head>
 
 <body>
 
-<h2>FREE KEY</h2>
+<div class="box">
 
-<div class="keybox" id="key">Click Get Key</div>
+<div class="title">FREE KEY</div>
 
 <button onclick="getKey()">GET KEY</button>
 
+<div id="result"></div>
+
+</div>
+
 <script>
 
-const link="https://link4m.net/N4WJcnr"
+const link4m="https://link4m.net/N4WJcnr"
+
+/* lấy parameter URL */
+
+const params = new URLSearchParams(location.search)
+const done = params.get("done")
+
+/* kiểm tra đã vượt link chưa */
 
 function getKey(){
 
-window.open(link,"_blank")
+if(!done){
 
-setTimeout(()=>{
+location.href = link4m
 
-fetch("https://YOUR-WORKER.workers.dev/key")
-.then(r=>r.text())
-.then(k=>{
+return
 
-localStorage.setItem("user_key",k)
+}
 
-document.getElementById("key").innerText=k
+createKey()
 
-})
+}
 
-},8000)
+/* tạo key */
+
+function createKey(){
+
+let last = localStorage.getItem("free_key_time")
+
+let now = Date.now()
+
+if(last && now-last < 86400000){
+
+let remain = 86400000-(now-last)
+
+let hours = Math.floor(remain/3600000)
+
+document.getElementById("result").innerHTML=
+"⛔ Bạn đã nhận key hôm nay<br>Thử lại sau "+hours+" giờ"
+
+return
+
+}
+
+let rand=Math.random().toString(36).substring(2,10).toUpperCase()
+
+let expire=Date.now()+86400000
+
+let key="FREE-"+rand+"-"+expire
+
+localStorage.setItem("free_key_time",now)
+
+document.getElementById("result").innerHTML=
+
+`
+<div class="keybox">${key}</div>
+
+<div class="copy" onclick="copyKey('${key}')">
+CLICK TO COPY
+</div>
+
+`
+
+}
+
+/* copy */
+
+function copyKey(k){
+
+navigator.clipboard.writeText(k)
+
+alert("Đã copy key!")
 
 }
 
