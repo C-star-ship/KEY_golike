@@ -202,9 +202,27 @@ return id
 
 function bypass(){
 
-let done=localStorage.getItem("bypass")
+let today = new Date().toDateString()
 
-let today=new Date().toDateString()
+let done = localStorage.getItem("bypass")
+
+let back = localStorage.getItem("return")
+
+/* nếu vừa quay lại từ link */
+
+if(back=="1"){
+
+localStorage.setItem("bypass",today)
+
+localStorage.removeItem("return")
+
+generateKey()
+
+return
+
+}
+
+/* nếu chưa bypass */
 
 if(done!=today){
 
@@ -213,6 +231,12 @@ localStorage.setItem("return","1")
 window.location="https://link4m.net/N4WJcnr"
 
 return
+
+}
+
+/* đã bypass hôm nay */
+
+generateKey()
 
 }
 
