@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>FREE KEY</title>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -12,17 +13,19 @@ margin:0;
 background:black;
 font-family:monospace;
 overflow:hidden;
-color:#00ff00;
+color:#0f0;
 }
+
+/* MATRIX CANVAS */
 
 canvas{
 position:fixed;
 top:0;
 left:0;
-width:100%;
-height:100%;
 z-index:0;
 }
+
+/* CENTER BOX */
 
 .container{
 
@@ -33,81 +36,76 @@ left:50%;
 
 transform:translate(-50%,-50%);
 
-width:92%;
-max-width:450px;
-
-padding:35px;
+z-index:2;
 
 text-align:center;
 
-background:rgba(0,0,0,0.85);
+width:90%;
+max-width:420px;
+
+padding:40px;
+
+background:#000;
 
 border-radius:15px;
 
 border:2px solid #00ff00;
 
 box-shadow:
-0 0 20px #00ff00,
-0 0 60px #00ff00;
 
-z-index:2;
+0 0 30px #00ff00,
+0 0 80px #00ff00;
 
 }
+
+/* TITLE */
 
 .title{
+
 font-size:28px;
 margin-bottom:20px;
+
 }
+
+/* BUTTON */
 
 button{
 
 width:100%;
-
-padding:16px;
+padding:14px;
 
 margin-top:15px;
 
-font-size:17px;
+font-size:16px;
 
-font-weight:bold;
+background:#00ff00;
 
 border:none;
 
 border-radius:8px;
 
-background:#00ff00;
-
 cursor:pointer;
 
+font-weight:bold;
+
 }
 
-.keybox{
+/* KEY TEXT */
 
-margin-top:20px;
+.key{
 
-padding:18px;
-
-font-size:20px;
-
-background:#000;
-
-border:2px solid #00ff00;
-
-border-radius:10px;
-
+margin-top:15px;
+color:#0ff;
 word-break:break-all;
 
-color:#00ffff;
-
 }
+
+/* TIMER */
 
 .timer{
 
-margin-top:12px;
-
+margin-top:10px;
 color:#fff;
-
-font-size:15px;
 
 }
 
@@ -124,7 +122,7 @@ font-size:15px;
 
 <button onclick="bypass()">GET KEY</button>
 
-<div class="keybox" id="keybox">NO KEY</div>
+<div class="key" id="key"></div>
 
 <div class="timer" id="timer"></div>
 
@@ -139,27 +137,31 @@ font-size:15px;
 const canvas=document.getElementById("matrix")
 const ctx=canvas.getContext("2d")
 
-canvas.width=window.innerWidth
 canvas.height=window.innerHeight
+canvas.width=window.innerWidth
 
 const letters="01"
+
 const fontSize=14
+
 const columns=canvas.width/fontSize
+
 const drops=[]
 
-for(let i=0;i<columns;i++) drops[i]=1
+for(let x=0;x<columns;x++)
+drops[x]=1
 
 function draw(){
 
 ctx.fillStyle="rgba(0,0,0,0.05)"
 ctx.fillRect(0,0,canvas.width,canvas.height)
 
-ctx.fillStyle="#00ff00"
+ctx.fillStyle="#0f0"
 ctx.font=fontSize+"px monospace"
 
 for(let i=0;i<drops.length;i++){
 
-let text=letters[Math.floor(Math.random()*letters.length)]
+const text=letters[Math.floor(Math.random()*letters.length)]
 
 ctx.fillText(text,i*fontSize,drops[i]*fontSize)
 
@@ -174,7 +176,7 @@ drops[i]++
 
 setInterval(draw,33)
 
-/* RANDOM KEY */
+/* RANDOM */
 
 function random(len){
 
@@ -193,13 +195,25 @@ return s
 
 function generateKey(){
 
-let expire=Date.now()+20
+let saved=localStorage.getItem("free_key")
+
+if(saved){
+
+document.getElementById("key").innerText="key = "+saved
+
+startTimer()
+
+return
+
+}
+
+let expire=Date.now()+86400000
 
 let key="FREE-"+random(8)+"-"+expire
 
 localStorage.setItem("free_key",key)
 
-document.getElementById("keybox").innerText=key
+document.getElementById("key").innerText="key = "+key
 
 startTimer()
 
@@ -217,14 +231,15 @@ let expire=parseInt(key.split("-")[2])
 
 function update(){
 
-let diff=expire-Date.now()
+let now=Date.now()
+
+let diff=expire-now
 
 if(diff<=0){
 
 localStorage.removeItem("free_key")
-localStorage.removeItem("bypass")
 
-document.getElementById("timer").innerText="Key expired"
+document.getElementById("timer").innerText="Key reset!"
 
 return
 
@@ -243,44 +258,35 @@ setInterval(update,1000)
 
 }
 
-/* COPY KEY */
+/* COPY */
 
 function copyKey(){
 
 let key=localStorage.getItem("free_key")
 
-if(!key){
-alert("No key")
-return
-}
+if(!key) return
 
 navigator.clipboard.writeText(key)
 
-alert("Copied key!")
+alert("Copied!")
 
 }
 
-/* BYPASS LINK4M */
+/* BYPASS */
 
 function bypass(){
 
-let key=localStorage.getItem("free_key")
+let today=new Date().toDateString()
 
-if(key){
+let done=localStorage.getItem("bypass")
 
-document.getElementById("keybox").innerText=key
-
-startTimer()
-
-return
-
-}
-
-let back=localStorage.getItem("back")
+let back=localStorage.getItem("return")
 
 if(back==="1"){
 
-localStorage.removeItem("back")
+localStorage.setItem("bypass",today)
+
+localStorage.removeItem("return")
 
 generateKey()
 
@@ -288,11 +294,17 @@ return
 
 }
 
-/* LINK4M */
+if(done===today){
 
-localStorage.setItem("back","1")
+generateKey()
 
-window.location.href="https://yeumoney.com/drQjHAzmz"
+return
+
+}
+
+localStorage.setItem("return","1")
+
+window.location="https://link4m.net/N4WJcnr"
 
 }
 
@@ -300,15 +312,7 @@ window.location.href="https://yeumoney.com/drQjHAzmz"
 
 window.onload=function(){
 
-let key=localStorage.getItem("free_key")
-
-if(key){
-
-document.getElementById("keybox").innerText=key
-
-startTimer()
-
-}
+generateKey()
 
 }
 
