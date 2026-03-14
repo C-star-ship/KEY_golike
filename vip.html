@@ -1,160 +1,110 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>XWORLD VIP KEY</title>
+<title>VIP KEY GENERATOR</title>
 
 <style>
 
 body{
-margin:0;
 background:black;
 color:#0f0;
 font-family:monospace;
-overflow:hidden;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
 }
 
-/* matrix */
+.box{
 
-canvas{
-position:fixed;
-top:0;
-left:0;
-}
-
-/* card */
-
-.card{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-background:rgba(0,0,0,0.85);
+background:#000;
 padding:40px;
-width:360px;
-text-align:center;
+
+border:2px solid #0f0;
 border-radius:15px;
-border:1px solid #0f0;
-box-shadow:0 0 20px #0f0;
+
+box-shadow:0 0 25px #0f0;
+
+text-align:center;
+
+width:90%;
+max-width:420px;
+
 }
 
-h1{
-color:#0ff;
-margin-bottom:10px;
+h2{
+margin-bottom:25px;
 }
 
 input{
+
 width:100%;
 padding:12px;
-margin-top:10px;
+
 background:#111;
 border:1px solid #0f0;
+
 color:#0f0;
+
+margin-bottom:15px;
+
 }
 
 button{
+
 width:100%;
-padding:12px;
-margin-top:12px;
+padding:14px;
+
 background:#0f0;
 border:none;
+
 font-weight:bold;
 cursor:pointer;
-}
 
-button:hover{
-box-shadow:0 0 10px #0f0;
+margin-top:10px;
+
 }
 
 .result{
-margin-top:20px;
-font-size:18px;
-color:#0ff;
-word-break:break-all;
-}
 
-.copy{
-background:#00bcd4;
+margin-top:20px;
+font-size:16px;
+
+color:#0ff;
+
+word-break:break-all;
+
 }
 
 </style>
+
 </head>
 
 <body>
 
-<canvas id="matrix"></canvas>
+<div class="box">
 
-<div class="card">
+<h2>VIP KEY GENERATOR</h2>
 
-<h1>VIP KEY GENERATOR</h1>
+<input id="days" placeholder="Nhập số ngày (ví dụ 7)">
 
-<input id="secret" placeholder="ADMIN SECRET">
+<button onclick="createKey()">CREATE KEY</button>
 
-<input id="days" type="number" placeholder="Số ngày VIP">
-
-<button onclick="generateVIP()">TẠO VIP KEY</button>
-
-<div class="result" id="result">
-day = -
-<br>
-key = -
-</div>
-
-<button class="copy" onclick="copyKey()">COPY KEY</button>
+<div class="result" id="result"></div>
 
 </div>
 
 <script>
 
-/* MATRIX EFFECT */
-
-const canvas=document.getElementById("matrix")
-const ctx=canvas.getContext("2d")
-
-canvas.height=window.innerHeight
-canvas.width=window.innerWidth
-
-const letters="01"
-const fontSize=14
-const columns=canvas.width/fontSize
-const drops=[]
-
-for(let i=0;i<columns;i++) drops[i]=1
-
-function draw(){
-
-ctx.fillStyle="rgba(0,0,0,0.05)"
-ctx.fillRect(0,0,canvas.width,canvas.height)
-
-ctx.fillStyle="#0f0"
-ctx.font=fontSize+"px monospace"
-
-for(let i=0;i<drops.length;i++){
-
-const text=letters[Math.floor(Math.random()*letters.length)]
-
-ctx.fillText(text,i*fontSize,drops[i]*fontSize)
-
-if(drops[i]*fontSize>canvas.height && Math.random()>0.975)
-drops[i]=0
-
-drops[i]++
-
-}
-
-}
-
-setInterval(draw,33)
-
-/* RANDOM */
-
-function random(len){
+function random(n){
 
 const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 
 let s=""
 
-for(let i=0;i<len;i++){
+for(let i=0;i<n;i++){
 
 s+=chars[Math.floor(Math.random()*chars.length)]
 
@@ -164,21 +114,9 @@ return s
 
 }
 
-/* GENERATE VIP */
-
-function generateVIP(){
-
-let secret=document.getElementById("secret").value
+function createKey(){
 
 let days=parseInt(document.getElementById("days").value)
-
-if(secret!=="ADMIN123"){
-
-alert("Sai admin secret")
-
-return
-
-}
 
 if(!days){
 
@@ -192,22 +130,8 @@ let expire=Date.now()+days*86400000
 
 let key="VIP-"+random(10)+"-"+expire
 
-document.getElementById("result").innerHTML=
-
-"day = "+days+
-"<br>key = "+key
-
-}
-
-/* COPY */
-
-function copyKey(){
-
-let text=document.getElementById("result").innerText
-
-navigator.clipboard.writeText(text)
-
-alert("Đã copy")
+document.getElementById("result").innerText=
+"day = "+days+"\n\nkey = "+key
 
 }
 
