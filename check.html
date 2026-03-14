@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
-
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
@@ -41,7 +41,6 @@ margin-bottom:20px;
 }
 
 .result{
-margin-top:20px;
 font-size:18px;
 word-break:break-all;
 }
@@ -64,19 +63,16 @@ CHECKING...
 
 <script>
 
-/* API worker */
-
-const API="https://YOUR-WORKER.workers.dev/check"
-
 /* lấy key từ URL */
 
-const params=new URLSearchParams(location.search)
+const params = new URLSearchParams(location.search)
+const key = params.get("key")
 
-const key=params.get("key")
+const result = document.getElementById("result")
 
 if(!key){
 
-document.getElementById("result").innerText="❌ NO KEY"
+result.innerText="❌ NO KEY"
 
 }else{
 
@@ -86,32 +82,28 @@ checkKey(key)
 
 function checkKey(key){
 
-fetch(API+"?key="+key)
+let parts = key.split("-")
 
-.then(r=>r.text())
+if(parts.length < 3){
 
-.then(data=>{
-
-if(data==="VALID"){
-
-document.getElementById("result").innerText=
-"✅ KEY VALID\n\n"+key
-
-}else{
-
-document.getElementById("result").innerText=
-"⛔ INVALID KEY"
+result.innerText="❌ INVALID KEY"
+return
 
 }
 
-})
+let expire = parseInt(parts[parts.length-1])
 
-.catch(()=>{
+let now = Date.now()
 
-document.getElementById("result").innerText=
-"⚠ API ERROR"
+if(now > expire){
 
-})
+result.innerText="⛔ KEY EXPIRED"
+return
+
+}
+
+result.innerText=
+"✅ KEY VALID\n\n"+key
 
 }
 
