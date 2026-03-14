@@ -1,34 +1,222 @@
 <!DOCTYPE html>
 <html>
 <head>
+
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>CHECK KEY</title>
+
+<style>
+
+body{
+margin:0;
+background:black;
+color:#00ff00;
+font-family:monospace;
+overflow:hidden;
+}
+
+/* MATRIX */
+
+canvas{
+position:fixed;
+top:0;
+left:0;
+z-index:-1;
+}
+
+/* BOX */
+
+.box{
+
+position:absolute;
+
+top:50%;
+left:50%;
+
+transform:translate(-50%,-50%);
+
+width:92%;
+max-width:420px;
+
+background:#000;
+
+padding:35px;
+
+border-radius:15px;
+
+border:2px solid #00ff00;
+
+box-shadow:
+0 0 25px #00ff00,
+0 0 90px #00ff00;
+
+text-align:center;
+
+}
+
+/* TEXT */
+
+.title{
+font-size:26px;
+margin-bottom:20px;
+}
+
+.row{
+margin:8px 0;
+font-size:16px;
+}
+
+.valid{
+color:#00ffff;
+}
+
+.expired{
+color:red;
+}
+
+</style>
+
 </head>
 
 <body>
 
-<pre id="result">INVALID</pre>
+<canvas id="matrix"></canvas>
+
+<div class="box">
+
+<div class="title">CHECK KEY</div>
+
+<div id="result">Đang kiểm tra...</div>
+
+</div>
 
 <script>
 
+/* MATRIX */
+
+const canvas=document.getElementById("matrix")
+const ctx=canvas.getContext("2d")
+
+canvas.height=window.innerHeight
+canvas.width=window.innerWidth
+
+const letters="01"
+const fontSize=14
+const columns=canvas.width/fontSize
+
+const drops=[]
+
+for(let x=0;x<columns;x++)
+drops[x]=1
+
+function draw(){
+
+ctx.fillStyle="rgba(0,0,0,0.05)"
+ctx.fillRect(0,0,canvas.width,canvas.height)
+
+ctx.fillStyle="#0F0"
+ctx.font=fontSize+"px monospace"
+
+for(let i=0;i<drops.length;i++){
+
+const text=letters.charAt(Math.floor(Math.random()*letters.length))
+
+ctx.fillText(text,i*fontSize,drops[i]*fontSize)
+
+if(drops[i]*fontSize>canvas.height && Math.random()>0.975)
+drops[i]=0
+
+drops[i]++
+
+}
+
+}
+
+setInterval(draw,33)
+
+/* CHECK KEY */
+
 const params = new URLSearchParams(location.search)
+
 const key = params.get("key")
 
-if(key){
+if(!key){
 
-let parts = key.split("-")
+document.getElementById("result").innerHTML="❌ Không có key"
 
-if(parts.length >= 3){
+}else{
 
-let expire = parseInt(parts[parts.length-1])
-
-if(Date.now() < expire){
-
-document.getElementById("result").innerText="VALID"
+checkKey(key)
 
 }
 
+function checkKey(key){
+
+let parts=key.split("-")
+
+if(parts.length<3){
+
+document.getElementById("result").innerHTML="❌ KEY KHÔNG HỢP LỆ"
+
+return
+
 }
+
+let type=parts[0]
+
+let expire=parseInt(parts[parts.length-1])
+
+let now=Date.now()
+
+let create=expire-86400000
+
+let createDate=new Date(create).toLocaleString()
+
+let expireDate=new Date(expire).toLocaleString()
+
+if(now>expire){
+
+document.getElementById("result").innerHTML=
+
+`
+<div class="row expired">⛔ KEY EXPIRED</div>
+
+<div class="row">Key: ${key}</div>
+
+<div class="row">Type: ${type}</div>
+
+<div class="row">Created: ${createDate}</div>
+
+<div class="row">Expired: ${expireDate}</div>
+`
+
+return
+
+}
+
+let remain=expire-now
+
+let hours=Math.floor(remain/3600000)
+
+let days=Math.floor(hours/24)
+
+document.getElementById("result").innerHTML=
+
+`
+<div class="row valid">✔ KEY VALID</div>
+
+<div class="row">Key: ${key}</div>
+
+<div class="row">Type: ${type}</div>
+
+<div class="row">Created: ${createDate}</div>
+
+<div class="row">Expired: ${expireDate}</div>
+
+<div class="row">Remaining: ${hours} giờ (${days} ngày)</div>
+`
 
 }
 
