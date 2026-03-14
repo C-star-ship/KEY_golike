@@ -4,53 +4,57 @@
 <meta charset="UTF-8">
 <title>FREE KEY</title>
 
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:monospace;
-}
-
 body{
+margin:0;
 background:black;
+font-family:monospace;
 overflow:hidden;
+color:#0f0;
 }
 
-/* MATRIX */
+/* MATRIX CANVAS */
 
 canvas{
 position:fixed;
 top:0;
 left:0;
+z-index:0;
 }
 
-/* CARD */
+/* CENTER BOX */
 
-.box{
+.container{
 
 position:absolute;
+
 top:50%;
 left:50%;
+
 transform:translate(-50%,-50%);
 
-width:95%;
-max-width:650px;
-
-padding:70px 40px;
-
-background:rgba(0,0,0,0.9);
-
-border-radius:25px;
-
-border:3px solid #00ff00;
-
-box-shadow:
-0 0 40px #00ff00,
-0 0 120px #00ff00;
+z-index:2;
 
 text-align:center;
+
+width:90%;
+max-width:420px;
+
+padding:40px;
+
+background:#000;
+
+border-radius:15px;
+
+border:2px solid #00ff00;
+
+box-shadow:
+
+0 0 30px #00ff00,
+0 0 80px #00ff00;
 
 }
 
@@ -58,62 +62,50 @@ text-align:center;
 
 .title{
 
-color:#00ff00;
-
-font-size:40px;
-
-margin-bottom:40px;
+font-size:28px;
+margin-bottom:20px;
 
 }
 
 /* BUTTON */
 
-.btn{
+button{
 
 width:100%;
+padding:14px;
 
-padding:22px;
+margin-top:15px;
 
-font-size:22px;
+font-size:16px;
 
 background:#00ff00;
 
 border:none;
 
-border-radius:12px;
-
-margin-top:20px;
-
-font-weight:bold;
+border-radius:8px;
 
 cursor:pointer;
 
+font-weight:bold;
+
 }
 
-
-/* KEY */
+/* KEY TEXT */
 
 .key{
 
-margin-top:25px;
-
-color:#00ffff;
-
-font-size:18px;
-
+margin-top:15px;
+color:#0ff;
 word-break:break-all;
 
 }
 
-/* EXPIRE */
+/* TIMER */
 
-.exp{
+.timer{
 
-color:#aaa;
-
-font-size:14px;
-
-margin-top:8px;
+margin-top:10px;
+color:#fff;
 
 }
 
@@ -124,23 +116,23 @@ margin-top:8px;
 
 <canvas id="matrix"></canvas>
 
-<div class="box">
+<div class="container">
 
 <div class="title">FREE KEY</div>
 
-<button class="btn" onclick="bypass()">GET KEY</button>
+<button onclick="bypass()">GET KEY</button>
 
 <div class="key" id="key"></div>
 
-<div class="exp" id="expire"></div>
+<div class="timer" id="timer"></div>
 
-<button class="btn" onclick="copyKey()">COPY KEY</button>
+<button onclick="copyKey()">COPY KEY</button>
 
 </div>
 
 <script>
 
-/* MATRIX */
+/* MATRIX EFFECT */
 
 const canvas=document.getElementById("matrix")
 const ctx=canvas.getContext("2d")
@@ -149,11 +141,15 @@ canvas.height=window.innerHeight
 canvas.width=window.innerWidth
 
 const letters="01"
-const font=16
-const columns=canvas.width/font
+
+const fontSize=14
+
+const columns=canvas.width/fontSize
+
 const drops=[]
 
-for(let i=0;i<columns;i++) drops[i]=1
+for(let x=0;x<columns;x++)
+drops[x]=1
 
 function draw(){
 
@@ -161,15 +157,15 @@ ctx.fillStyle="rgba(0,0,0,0.05)"
 ctx.fillRect(0,0,canvas.width,canvas.height)
 
 ctx.fillStyle="#0f0"
-ctx.font=font+"px monospace"
+ctx.font=fontSize+"px monospace"
 
 for(let i=0;i<drops.length;i++){
 
-let text=letters[Math.floor(Math.random()*letters.length)]
+const text=letters[Math.floor(Math.random()*letters.length)]
 
-ctx.fillText(text,i*font,drops[i]*font)
+ctx.fillText(text,i*fontSize,drops[i]*fontSize)
 
-if(drops[i]*font>canvas.height && Math.random()>0.975)
+if(drops[i]*fontSize>canvas.height && Math.random()>0.975)
 drops[i]=0
 
 drops[i]++
@@ -180,21 +176,99 @@ drops[i]++
 
 setInterval(draw,33)
 
-/* DEVICE */
+/* RANDOM */
 
-function getDevice(){
+function random(len){
 
-let id=localStorage.getItem("device")
+const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 
-if(!id){
+let s=""
 
-id=Math.random().toString(36).substring(2)
+for(let i=0;i<len;i++)
+s+=chars[Math.floor(Math.random()*chars.length)]
 
-localStorage.setItem("device",id)
+return s
 
 }
 
-return id
+/* GENERATE KEY */
+
+function generateKey(){
+
+let saved=localStorage.getItem("free_key")
+
+if(saved){
+
+document.getElementById("key").innerText="key = "+saved
+
+startTimer()
+
+return
+
+}
+
+let expire=Date.now()+86400000
+
+let key="FREE-"+random(8)+"-"+expire
+
+localStorage.setItem("free_key",key)
+
+document.getElementById("key").innerText="key = "+key
+
+startTimer()
+
+}
+
+/* TIMER */
+
+function startTimer(){
+
+let key=localStorage.getItem("free_key")
+
+if(!key) return
+
+let expire=parseInt(key.split("-")[2])
+
+function update(){
+
+let now=Date.now()
+
+let diff=expire-now
+
+if(diff<=0){
+
+localStorage.removeItem("free_key")
+
+document.getElementById("timer").innerText="Key reset!"
+
+return
+
+}
+
+let h=Math.floor(diff/3600000)
+let m=Math.floor(diff%3600000/60000)
+let s=Math.floor(diff%60000/1000)
+
+document.getElementById("timer").innerText=
+"reset in "+h+"h "+m+"m "+s+"s"
+
+}
+
+setInterval(update,1000)
+
+}
+
+/* COPY */
+
+function copyKey(){
+
+let key=localStorage.getItem("free_key")
+
+if(!key) return
+
+navigator.clipboard.writeText(key)
+
+alert("Copied!")
 
 }
 
@@ -202,15 +276,13 @@ return id
 
 function bypass(){
 
-let today = new Date().toDateString()
+let today=new Date().toDateString()
 
-let done = localStorage.getItem("bypass")
+let done=localStorage.getItem("bypass")
 
-let back = localStorage.getItem("return")
+let back=localStorage.getItem("return")
 
-/* nếu vừa quay lại từ link */
-
-if(back=="1"){
+if(back==="1"){
 
 localStorage.setItem("bypass",today)
 
@@ -222,84 +294,23 @@ return
 
 }
 
-/* nếu chưa bypass */
+if(done===today){
 
-if(done!=today){
-
-localStorage.setItem("return","1")
-
-window.location="https://link4m.net/N4WJcnr"
+generateKey()
 
 return
 
 }
 
-/* đã bypass hôm nay */
+localStorage.setItem("return","1")
 
-generateKey()
-
-}
-
-generateKey()
+window.location="https://link4m.net/N4WJcnr"
 
 }
 
-/* SHA256 */
+/* LOAD */
 
-async function sha256(text){
-
-const msg=new TextEncoder().encode(text)
-
-const hash=await crypto.subtle.digest("SHA-256",msg)
-
-return Array.from(new Uint8Array(hash))
-.map(b=>b.toString(16).padStart(2,"0"))
-.join("")
-
-}
-
-/* CREATE KEY */
-
-async function generateKey(){
-
-let device=getDevice()
-
-let today=new Date().toISOString().slice(0,10)
-
-let raw=device+today
-
-let hash=await sha256(raw)
-
-let expire=Date.now()+86400000
-
-let key="FREE-"+hash.substring(0,8).toUpperCase()+"-"+expire
-
-document.getElementById("key").innerText="key = "+key
-
-document.getElementById("expire").innerText=
-"expire = "+new Date(expire).toLocaleString()
-
-}
-
-/* COPY */
-
-function copyKey(){
-
-let k=document.getElementById("key").innerText
-
-navigator.clipboard.writeText(k)
-
-alert("Copied!")
-
-}
-
-/* RETURN FROM BYPASS */
-
-if(localStorage.getItem("return")){
-
-localStorage.removeItem("return")
-
-localStorage.setItem("bypass",new Date().toDateString())
+window.onload=function(){
 
 generateKey()
 
