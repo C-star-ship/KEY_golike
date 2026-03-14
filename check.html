@@ -63,8 +63,6 @@ CHECKING...
 
 <script>
 
-/* lấy key từ URL */
-
 const params = new URLSearchParams(location.search)
 const key = params.get("key")
 
@@ -72,24 +70,17 @@ const result = document.getElementById("result")
 
 if(!key){
 
-result.innerText="❌ NO KEY"
+result.innerText="INVALID"
 
 }else{
-
-checkKey(key)
-
-}
-
-function checkKey(key){
 
 let parts = key.split("-")
 
 if(parts.length < 3){
 
-result.innerText="❌ INVALID KEY"
-return
+result.innerText="INVALID"
 
-}
+}else{
 
 let expire = parseInt(parts[parts.length-1])
 
@@ -97,13 +88,15 @@ let now = Date.now()
 
 if(now > expire){
 
-result.innerText="⛔ KEY EXPIRED"
-return
+result.innerText="EXPIRED"
+
+}else{
+
+result.innerText="VALID"
 
 }
 
-result.innerText=
-"✅ KEY VALID\n\n"+key
+}
 
 }
 
