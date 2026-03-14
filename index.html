@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>XWORLD KEY SYSTEM</title>
+
+<style>
+
+body{
+margin:0;
+background:black;
+color:#0f0;
+font-family:monospace;
+overflow:hidden;
+}
+
+canvas{
+position:fixed;
+top:0;
+left:0;
+}
+
+/* CARD */
+
+.card{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:rgba(0,0,0,0.85);
+padding:40px;
+border-radius:15px;
+width:360px;
+text-align:center;
+border:1px solid #0f0;
+box-shadow:0 0 20px #0f0;
+}
+
+h1{
+color:#0ff;
+margin-bottom:10px;
+}
+
+button{
+width:100%;
+padding:12px;
+margin-top:10px;
+background:#0f0;
+border:none;
+font-weight:bold;
+cursor:pointer;
+}
+
+button:hover{
+box-shadow:0 0 10px #0f0;
+}
+
+input{
+width:100%;
+padding:10px;
+margin-top:10px;
+background:#111;
+border:1px solid #0f0;
+color:#0f0;
+}
+
+.key{
+margin-top:20px;
+font-size:20px;
+color:#0ff;
+word-break:break-all;
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="matrix"></canvas>
+
+<div class="card">
+
+<h1>XWORLD KEY</h1>
+
+<p id="device"></p>
+
+<button onclick="getFreeKey()">GET FREE KEY</button>
+
+<input id="secret" placeholder="ADMIN SECRET">
+
+<button onclick="generateVIP()">GENERATE VIP KEY</button>
+
+<div class="key" id="key">---</div>
+
+<button onclick="copyKey()">COPY KEY</button>
+
+</div>
+
+<script>
+
+/* MATRIX */
+
+const canvas=document.getElementById("matrix")
+const ctx=canvas.getContext("2d")
+
+canvas.height=window.innerHeight
+canvas.width=window.innerWidth
+
+const letters="01"
+const fontSize=14
+const columns=canvas.width/fontSize
+const drops=[]
+
+for(let i=0;i<columns;i++) drops[i]=1
+
+function draw(){
+
+ctx.fillStyle="rgba(0,0,0,0.05)"
+ctx.fillRect(0,0,canvas.width,canvas.height)
+
+ctx.fillStyle="#0f0"
+ctx.font=fontSize+"px monospace"
+
+for(let i=0;i<drops.length;i++){
+
+const text=letters[Math.floor(Math.random()*letters.length)]
+
+ctx.fillText(text,i*fontSize,drops[i]*fontSize)
+
+if(drops[i]*fontSize>canvas.height && Math.random()>0.975)
+drops[i]=0
+
+drops[i]++
+
+}
+
+}
+
+setInterval(draw,33)
+
+/* DEVICE */
+
+function deviceID(){
+return navigator.userAgent+screen.width+screen.height
+}
+
+document.getElementById("device").innerText="Device: "+deviceID().substring(0,40)
+
+/* SHA256 */
+
+async function sha256(text){
+
+const buf=new TextEncoder().encode(text)
+
+const hash=await crypto.subtle.digest("SHA-256",buf)
+
+return Array.from(new Uint8Array(hash))
+.map(x=>x.toString(16).padStart(2,"0")).join("")
+
+}
+
+/* FREE KEY */
+
+async function getFreeKey(){
+
+window.open("https://linkvertise.com","_blank")
+
+let raw=deviceID()+"-FREE"
+
+let key=await sha256(raw)
+
+key=key.substring(0,16).toUpperCase()
+
+document.getElementById("key").innerText=key
+
+}
+
+/* VIP KEY */
+
+async function generateVIP(){
+
+let secret=document.getElementById("secret").value
+
+if(secret!=="ADMIN123"){
+
+alert("Sai admin secret")
+
+return
+
+}
+
+let raw=deviceID()+"-VIP"
+
+let key=await sha256(raw)
+
+key=key.substring(0,20).toUpperCase()
+
+document.getElementById("key").innerText=key
+
+}
+
+/* COPY */
+
+function copyKey(){
+
+let key=document.getElementById("key").innerText
+
+navigator.clipboard.writeText(key)
+
+alert("Copied: "+key)
+
+}
+
+</script>
+
+</body>
+</html>
