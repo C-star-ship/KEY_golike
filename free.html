@@ -16,10 +16,9 @@ font-family:monospace;
 body{
 background:black;
 overflow:hidden;
-color:#0f0;
 }
 
-/* matrix */
+/* MATRIX */
 
 canvas{
 position:fixed;
@@ -27,7 +26,7 @@ top:0;
 left:0;
 }
 
-/* card */
+/* CARD */
 
 .box{
 
@@ -36,95 +35,94 @@ top:50%;
 left:50%;
 transform:translate(-50%,-50%);
 
-width:90%;
-max-width:420px;
+width:92%;
+max-width:520px;
 
-padding:45px;
+padding:55px 35px;
 
 background:rgba(0,0,0,0.9);
 
-border:2px solid #0f0;
-border-radius:18px;
+border-radius:20px;
+
+border:2px solid #00ff00;
+
+box-shadow:
+0 0 25px #00ff00,
+0 0 80px #00ff00;
 
 text-align:center;
 
-box-shadow:
-0 0 20px #0f0,
-0 0 60px #0f0;
+}
+
+/* TITLE */
+
+.title{
+
+color:#00ff00;
+
+font-size:32px;
+
+margin-bottom:35px;
 
 }
 
-/* title */
+/* BUTTON */
 
-h2{
-
-font-size:28px;
-margin-bottom:25px;
-
-}
-
-/* button */
-
-button{
+.btn{
 
 width:100%;
 
-padding:16px;
+padding:18px;
 
-margin-top:10px;
-
-font-size:16px;
+font-size:18px;
 
 background:#00ff00;
 
 border:none;
 
-border-radius:8px;
+border-radius:10px;
+
+margin-top:15px;
 
 font-weight:bold;
 
 cursor:pointer;
 
-transition:0.3s;
+}
+
+.btn:hover{
+
+box-shadow:0 0 20px #00ff00;
 
 }
 
-button:hover{
-
-box-shadow:0 0 20px #0f0;
-
-transform:scale(1.05);
-
-}
-
-/* key */
+/* KEY */
 
 .key{
 
 margin-top:25px;
 
-font-size:18px;
+color:#00ffff;
 
-color:#0ff;
+font-size:18px;
 
 word-break:break-all;
 
 }
 
-/* expire */
+/* EXPIRE */
 
 .exp{
+
+color:#aaa;
 
 font-size:14px;
 
 margin-top:8px;
 
-color:#aaa;
-
 }
 
 </style>
-
 </head>
 
 <body>
@@ -133,31 +131,31 @@ color:#aaa;
 
 <div class="box">
 
-<h2>FREE KEY</h2>
+<div class="title">FREE KEY</div>
 
-<button onclick="bypass()">GET KEY</button>
+<button class="btn" onclick="bypass()">GET KEY</button>
 
-<div class="key" id="keybox"></div>
+<div class="key" id="key"></div>
 
 <div class="exp" id="expire"></div>
 
-<button onclick="copyKey()">COPY KEY</button>
+<button class="btn" onclick="copyKey()">COPY KEY</button>
 
 </div>
 
 <script>
 
-/* matrix */
+/* MATRIX */
 
-const c=document.getElementById("matrix")
-const ctx=c.getContext("2d")
+const canvas=document.getElementById("matrix")
+const ctx=canvas.getContext("2d")
 
-c.height=window.innerHeight
-c.width=window.innerWidth
+canvas.height=window.innerHeight
+canvas.width=window.innerWidth
 
 const letters="01"
-const size=16
-const columns=c.width/size
+const font=16
+const columns=canvas.width/font
 const drops=[]
 
 for(let i=0;i<columns;i++) drops[i]=1
@@ -165,18 +163,18 @@ for(let i=0;i<columns;i++) drops[i]=1
 function draw(){
 
 ctx.fillStyle="rgba(0,0,0,0.05)"
-ctx.fillRect(0,0,c.width,c.height)
+ctx.fillRect(0,0,canvas.width,canvas.height)
 
 ctx.fillStyle="#0f0"
-ctx.font=size+"px monospace"
+ctx.font=font+"px monospace"
 
 for(let i=0;i<drops.length;i++){
 
 let text=letters[Math.floor(Math.random()*letters.length)]
 
-ctx.fillText(text,i*size,drops[i]*size)
+ctx.fillText(text,i*font,drops[i]*font)
 
-if(drops[i]*size>c.height && Math.random()>0.975)
+if(drops[i]*font>canvas.height && Math.random()>0.975)
 drops[i]=0
 
 drops[i]++
@@ -187,7 +185,7 @@ drops[i]++
 
 setInterval(draw,33)
 
-/* device id */
+/* DEVICE */
 
 function getDevice(){
 
@@ -205,7 +203,7 @@ return id
 
 }
 
-/* bypass */
+/* BYPASS */
 
 function bypass(){
 
@@ -227,7 +225,21 @@ generateKey()
 
 }
 
-/* generate key */
+/* SHA256 */
+
+async function sha256(text){
+
+const msg=new TextEncoder().encode(text)
+
+const hash=await crypto.subtle.digest("SHA-256",msg)
+
+return Array.from(new Uint8Array(hash))
+.map(b=>b.toString(16).padStart(2,"0"))
+.join("")
+
+}
+
+/* CREATE KEY */
 
 async function generateKey(){
 
@@ -243,32 +255,18 @@ let expire=Date.now()+86400000
 
 let key="FREE-"+hash.substring(0,8).toUpperCase()+"-"+expire
 
-document.getElementById("keybox").innerText="key = "+key
+document.getElementById("key").innerText="key = "+key
 
 document.getElementById("expire").innerText=
 "expire = "+new Date(expire).toLocaleString()
 
 }
 
-/* sha256 */
-
-async function sha256(text){
-
-const msg=new TextEncoder().encode(text)
-
-const hash=await crypto.subtle.digest("SHA-256",msg)
-
-return Array.from(new Uint8Array(hash))
-.map(b=>b.toString(16).padStart(2,"0"))
-.join("")
-
-}
-
-/* copy */
+/* COPY */
 
 function copyKey(){
 
-let k=document.getElementById("keybox").innerText
+let k=document.getElementById("key").innerText
 
 navigator.clipboard.writeText(k)
 
@@ -276,7 +274,7 @@ alert("Copied!")
 
 }
 
-/* return bypass */
+/* RETURN FROM BYPASS */
 
 if(localStorage.getItem("return")){
 
