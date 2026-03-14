@@ -1,61 +1,54 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Check Key</title>
+import time
 
-<style>
-body{
-background:black;
-color:#0f0;
-font-family:monospace;
-text-align:center;
-padding-top:120px;
-}
+def check_key(key):
 
-input{
-padding:10px;
-width:260px;
-}
+    if not key:
+        return {"status":"invalid"}
 
-button{
-padding:10px;
-margin-top:10px;
-}
-</style>
+    parts = key.split("-")
 
-</head>
+    if len(parts) < 3:
+        return {"status":"invalid"}
 
-<body>
+    key_type = parts[0]
 
-<h2>CHECK KEY</h2>
+    try:
+        expire = int(parts[-1])
+    except:
+        return {"status":"invalid"}
 
-<input id="key">
+    now = int(time.time()*1000)
 
-<br>
+    if now > expire:
+        return {"status":"expired"}
 
-<button onclick="check()">CHECK</button>
+    remain = expire - now
 
-<p id="result"></p>
+    hours = int(remain / 3600000)
 
-<script>
+    if key_type == "FREE":
+        return {
+            "status":"valid",
+            "type":"free",
+            "remain_hours":hours
+        }
 
-function check(){
+    if key_type == "VIP":
+        return {
+            "status":"valid",
+            "type":"vip",
+            "remain_hours":hours
+        }
 
-let key=document.getElementById("key").value
+    return {"status":"invalid"}
 
-if(key.length==16){
 
-document.getElementById("result").innerText="KEY CÓ VẺ HỢP LỆ"
+# TEST
 
-}else{
+if __name__ == "__main__":
 
-document.getElementById("result").innerText="KEY KHÔNG ĐÚNG"
+    key = input("Nhập key: ")
 
-}
+    result = check_key(key)
 
-}
-
-</script>
-
-</body>
-</html>
+    print(result)
