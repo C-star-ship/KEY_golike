@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Unlock Key</title>
+
+<style>
+
+body{
+background:black;
+color:#00ff9f;
+font-family:monospace;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
+overflow:hidden;
+}
+
+canvas{
+position:fixed;
+top:0;
+left:0;
+z-index:-1;
+}
+
+.box{
+
+text-align:center;
+
+border:2px solid #00ff9f;
+
+padding:40px;
+
+border-radius:15px;
+
+box-shadow:
+0 0 20px #00ff9f,
+0 0 60px #00ff9f;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<canvas id="matrix"></canvas>
+
+<div class="box">
+
+<h2>VERIFYING LINK...</h2>
+
+<p>Preparing your key...</p>
+
+</div>
+
+<script>
+
+/* MATRIX */
+
+const canvas=document.getElementById("matrix")
+const ctx=canvas.getContext("2d")
+
+canvas.width=window.innerWidth
+canvas.height=window.innerHeight
+
+const letters="01"
+const fontSize=14
+const columns=canvas.width/fontSize
+
+const drops=[]
+
+for(let x=0;x<columns;x++) drops[x]=1
+
+function draw(){
+
+ctx.fillStyle="rgba(0,0,0,0.05)"
+ctx.fillRect(0,0,canvas.width,canvas.height)
+
+ctx.fillStyle="#0f0"
+ctx.font=fontSize+"px monospace"
+
+for(let i=0;i<drops.length;i++){
+
+const text=letters.charAt(Math.random()*letters.length)
+
+ctx.fillText(text,i*fontSize,drops[i]*fontSize)
+
+if(drops[i]*fontSize>canvas.height && Math.random()>0.975)
+drops[i]=0
+
+drops[i]++
+
+}
+
+}
+
+setInterval(draw,33)
+
+/* TOKEN SYSTEM */
+
+function randomToken(){
+
+return Math.random().toString(36).substring(2,12)
+
+}
+
+let token=randomToken()
+
+localStorage.setItem("unlock_token",token)
+
+setTimeout(()=>{
+
+location.href="free.html?token="+token
+
+},2000)
+
+</script>
+
+</body>
+</html>
