@@ -27,8 +27,10 @@ z-index:-1;
 .box{
 
 position:absolute;
+
 top:50%;
 left:50%;
+
 transform:translate(-50%,-50%);
 
 width:92%;
@@ -41,6 +43,7 @@ text-align:center;
 background:rgba(0,0,0,0.85);
 
 border:2px solid #00ff9f;
+
 border-radius:15px;
 
 box-shadow:
@@ -151,9 +154,15 @@ const saved=localStorage.getItem("unlock_token")
 
 if(!token || token!==saved){
 
-document.getElementById("result").innerText="ACCESS DENIED"
+document.getElementById("result").innerHTML=
+`
+ACCESS DENIED
 
-throw "no access"
+<br><br>
+
+GET KEY FROM LINK
+`
+return
 
 }
 
@@ -169,9 +178,15 @@ let remain=86400000-(now-last)
 
 let h=Math.floor(remain/3600000)
 
-document.getElementById("result").innerText=
+document.getElementById("result").innerHTML=
 
-"KEY ALREADY CLAIMED\nTRY AGAIN IN "+h+" HOURS"
+`
+KEY ALREADY CLAIMED
+
+<br><br>
+
+TRY AGAIN IN ${h} HOURS
+`
 
 }else{
 
